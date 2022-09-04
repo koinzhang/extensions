@@ -8,7 +8,6 @@ export default function PreviewRaycastWallpaper(props: { index: number; raycastW
   const { index, raycastWallpapers } = props;
   const imagesLength = raycastWallpapers.length;
   const [pageIndex, setPageIndex] = useState<number>(index);
-  console.log();
   return (
     <Detail
       navigationTitle={raycastWallpapers[pageIndex].title}
