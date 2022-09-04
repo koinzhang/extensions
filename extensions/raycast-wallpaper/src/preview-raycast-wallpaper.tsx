@@ -8,10 +8,13 @@ export default function PreviewRaycastWallpaper(props: { index: number; raycastW
   const { index, raycastWallpapers } = props;
   const imagesLength = raycastWallpapers.length;
   const [pageIndex, setPageIndex] = useState<number>(index);
+  console.log();
   return (
     <Detail
       navigationTitle={raycastWallpapers[pageIndex].title}
-      markdown={`<img src="${raycastWallpapers[pageIndex].url.replace(".png", "-preview.png")}" alt="" height="400" />`}
+      markdown={`<img src="${raycastWallpapers[pageIndex].url
+        .replace("-2.png", ".png")
+        .replace(".png", "-preview.png")}" alt="" height="400" />`}
       actions={
         <ActionPanel>
           <Action

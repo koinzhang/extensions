@@ -21,10 +21,13 @@ export function RaycastWallpaperList(props: { raycastWallpapers: RaycastWallpape
           <List.Item
             id={index + ""}
             key={index + value.title}
-            icon={{ source: value.url.replace(".png", "-preview.png") }}
+            icon={{ source: value.url.replace("-2.png", ".png").replace(".png", "-preview.png") }}
             title={value.title}
             detail={
-              <List.Item.Detail isLoading={false} markdown={`![](${value.url.replace(".png", "-preview.png")})`} />
+              <List.Item.Detail
+                isLoading={false}
+                markdown={`![](${value.url.replace("-2.png", ".png").replace(".png", "-preview.png")})`}
+              />
             }
             actions={<ActionOnRaycastWallpaper index={index} raycastWallpapers={raycastWallpapers} />}
           />

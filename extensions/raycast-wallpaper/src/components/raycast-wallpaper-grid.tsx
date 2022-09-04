@@ -21,7 +21,7 @@ export function RaycastWallpaperGrid(props: { raycastWallpapers: RaycastWallpape
           <Grid.Item
             id={index + ""}
             key={index + value.title}
-            content={value.url.replace(".png", "-preview.png")}
+            content={value.url.replace("-2.png", ".png").replace(".png", "-preview.png")}
             title={value.title}
             actions={<ActionOnRaycastWallpaper index={index} raycastWallpapers={raycastWallpapers} />}
           />
