@@ -5,7 +5,6 @@ import { LocalStorage, showToast, Toast } from "@raycast/api";
 import { cachePicture, checkCache } from "../utils/common-utils";
 import axios from "axios";
 import Style = Toast.Style;
-import { stringify } from "querystring";
 
 export const getRaycastWallpaperList = () => {
   const [raycastWallpapers, setRaycastWallpapers] = useState<RaycastWallpaper[]>([]);
