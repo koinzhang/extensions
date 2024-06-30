@@ -72,6 +72,14 @@
           "required": false
         },
         {
+          "name": "rememberShellTag",
+          "label": "Remember Shell Tag",
+          "description": "Remember the shell tag",
+          "type": "checkbox",
+          "default": true,
+          "required": false
+        },
+        {
           "name": "primaryAction",
           "type": "dropdown",
           "description": "Set the primary action.",
@@ -90,17 +98,6 @@
           ]
         }
       ]
-    }
-  ],
-  "preferences": [
-    {
-      "title": "Tips",
-      "name": "showTips",
-      "label": "Show Tips",
-      "description": "Show tips after successful execution of action",
-      "type": "checkbox",
-      "default": true,
-      "required": false
     }
   ],
   "dependencies": {

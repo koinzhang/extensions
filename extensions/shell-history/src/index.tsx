@@ -1,46 +1,75 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ActionPanel, Icon, List } from "@raycast/api";
-import { useShellHistory } from "./hooks/useShellHistory";
 import { allShellTags, ShellHistory } from "./types/types";
 import { ActionShellCommand } from "./components/action-shell-command";
 import { getCliIcon, getShellIcon } from "./utils/shell-utils";
 import { useShowDetail } from "./hooks/useShowDetail";
 import { ActionOpenPreferences } from "./components/action-open-preferences";
+import { useShellHistoryZsh } from "./hooks/useShellHistoryZsh";
+import { useShellHistoryBash } from "./hooks/useShellHistoryBash";
+import { useShellHistoryFish } from "./hooks/useShellHistoryFish";
+import { rememberShellTag } from "./types/preferences";
 
 export default function Index() {
   const [shellTag, setShellTag] = useState<string>("All");
-  const { data: shellHistoryData, isLoading, mutate } = useShellHistory();
+  const { data: shellHistoryZshData, isLoading: isLoadingZsh, mutate: mutateZsh } = useShellHistoryZsh();
+  const { data: shellHistoryBashData, isLoading: isLoadingBash, mutate: mutateBash } = useShellHistoryBash();
+  const { data: shellHistoryFishData, isLoading: isLoadingFish, mutate: mutateFish } = useShellHistoryFish();
   const { data: showDetailData, mutate: showDetailMutate } = useShowDetail();
 
-  const allsShellHistory = useMemo(() => {
-    return shellHistoryData;
-  }, [shellHistoryData]);
+  const allShellHistory = useMemo(() => {
+    const allShellHistory_ = [];
+    if (shellHistoryZshData) {
+      allShellHistory_.push(shellHistoryZshData);
+    }
+    if (shellHistoryBashData) {
+      allShellHistory_.push(shellHistoryBashData);
+    }
+    if (shellHistoryFishData) {
+      allShellHistory_.push(shellHistoryFishData);
+    }
+    return allShellHistory_;
+  }, [shellHistoryZshData, shellHistoryBashData, shellHistoryFishData]);
+
+  const isLoading = useMemo(() => {
+    return isLoadingZsh && isLoadingBash && isLoadingFish;
+  }, [isLoadingZsh, isLoadingBash, isLoadingFish]);
+
+  const mutate = useCallback(async () => {
+    await mutateZsh();
+    await mutateBash();
+    await mutateFish();
+  }, [mutateZsh, mutateBash, mutateFish]);
 
   const shellTags = useMemo(() => {
     const shellTags_ = [];
     shellTags_.push({ title: "All", value: "All", icon: Icon.Tag });
-    allsShellHistory?.forEach((shell, index) => {
-      if (shell.length > 0) {
-        const tag = allShellTags[index];
-        shellTags_.push({ title: tag.title, value: tag.value, icon: tag.icon });
-      }
-    });
+    if (shellHistoryZshData && shellHistoryZshData.length > 0) {
+      shellTags_.push({ title: allShellTags[0].title, value: allShellTags[0].value, icon: allShellTags[0].icon });
+    }
+    if (shellHistoryBashData && shellHistoryBashData.length > 0) {
+      shellTags_.push({ title: allShellTags[1].title, value: allShellTags[1].value, icon: allShellTags[1].icon });
+    }
+    if (shellHistoryFishData && shellHistoryFishData.length > 0) {
+      shellTags_.push({ title: allShellTags[2].title, value: allShellTags[2].value, icon: allShellTags[2].icon });
+    }
     return shellTags_;
-  }, [allsShellHistory]);
+  }, [shellHistoryZshData, shellHistoryBashData, shellHistoryFishData]);
 
   const shellHistory = useMemo(() => {
-    if (shellTag === shellTags[0].title) {
-      return allsShellHistory;
+    if (shellTag === "All") {
+      return allShellHistory;
     } else {
       const shellHistory: ShellHistory[][] = [];
-      for (let i = 0; i < allsShellHistory.length; i++) {
-        if (allsShellHistory[i].length > 0 && allsShellHistory[i][0].shell === shellTag) {
-          shellHistory.push(allsShellHistory[i]);
+      for (let i = 0; i < allShellHistory.length; i++) {
+        if (allShellHistory[i].length > 0 && allShellHistory[i][0].shell === shellTag) {
+          shellHistory.push(allShellHistory[i]);
+          break;
         }
       }
       return shellHistory;
     }
-  }, [allsShellHistory, shellTag]);
+  }, [allShellHistory, shellTag]);
 
   const showDetail = useMemo(() => {
     return showDetailData === 1;
@@ -54,7 +83,7 @@ export default function Index() {
       searchBarAccessory={
         <List.Dropdown
           tooltip="Shell"
-          storeValue={true}
+          storeValue={rememberShellTag}
           onChange={(newValue) => {
             setShellTag(newValue);
           }}
@@ -75,7 +104,7 @@ export default function Index() {
         }
       />
 
-      {shellHistory?.map((shell, shellIndex) => {
+      {shellHistory.map((shell, shellIndex) => {
         return (
           shell.length > 0 && (
             <List.Section key={shell[0].shell + shellIndex} title={shell[0].shell} subtitle={shell.length.toString()}>
@@ -89,7 +118,7 @@ export default function Index() {
                     title={{ value: history.command.replace("\n", " "), tooltip: history.command }}
                     accessories={
                       showDetail
-                        ? []
+                        ? undefined
                         : [
                             date
                               ? {
